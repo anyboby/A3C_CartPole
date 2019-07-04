@@ -47,9 +47,10 @@ class Agent:
         if random.random() < epsilon:
             #if Agent.frames%100==0: print("acting randomly: {}, frame nr: {}, eps: {}".format(a, Agent.frames, epsilon)) 
             uni_pi = [1/self.num_actions for i in range(0,self.num_actions)]    
-            a = random.randint(0,self.num_actions-1)
-            p = 1
-            return a, uni_pi, p
+            a = [2*random.random()-1 for i in range(0,4)]
+
+            a = random.randint(0,1)
+            return a, uni_pi
 
         
         else:
@@ -58,23 +59,22 @@ class Agent:
 
             #choose action with prob distribution of pi
             a = np.random.choice(range(len(pi)), p=pi)
-            p = pi[a]
+            #p = pi[a]
 
-            #a = [i*p for i in Constants.DISC_ACTIONS[a_i]]
-
+            a = Constants.DISC_ACTIONS[a]
             ###### for step value, pi vizualization ##########
-            self.master_network.data.v.append(self.master_network.predict_v(s)[0])
-            self.master_network.data.pi.append(pi)
-            self.master_network.data.frames_t.append(Agent.frames)
-            print ("frame: " + str(Agent.frames))
-            print ("value: " + str(self.master_network.data.v[-1]))
-            print ("pi: " + str(pi))
-            print ("chosen a: " + str(a))
-            print ("certainty p: " + str(p))
+            #self.master_network.data.v.append(self.master_network.predict_v(s)[0])
+            #self.master_network.data.pi.append(pi)
+            #self.master_network.data.frames_t.append(Agent.frames)
+            #print ("frame: " + str(Agent.frames))
+            #print ("value: " + str(self.master_network.data.v[-1]))
+            #print ("pi: " + str(pi))
+            #print ("chosen a: " + str(a))
+            #print ("certainty p: " + str(p))
             ###################################################
 
 
-            return a, pi, p
+            return a, pi
         
     """
     train receives a set of samples including state, action, reward and the next state
@@ -94,10 +94,10 @@ class Agent:
             
             return s, a, self.R, s_
 
-        a_hot = np.zeros(self.num_actions)
-        a_hot[a] = 1          #later needed, to access chosen action by easy multiplication 
+        #a_hot = np.zeros(self.num_actions)
+        #a_hot[a] = 1          #later needed, to access chosen action by easy multiplication 
         
-        self.memory.append ((s, a_hot, r, s_))
+        self.memory.append ((s, a, r, s_))
         
         self.R = (self.R + r * GAMMA_N) / GAMMA
 

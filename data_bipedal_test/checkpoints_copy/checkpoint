@@ -1,0 +1,6 @@
+model_checkpoint_path: "checkpoint6.0-30097"
+all_model_checkpoint_paths: "checkpoint49.0-365"
+all_model_checkpoint_paths: "checkpoint21.0-1849"
+all_model_checkpoint_paths: "checkpoint44.0-4199"
+all_model_checkpoint_paths: "checkpoint24.0-12875"
+all_model_checkpoint_paths: "checkpoint6.0-30097"

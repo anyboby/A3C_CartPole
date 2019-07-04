@@ -54,24 +54,21 @@ class MasterNetwork:
         #if not replay_mode: self.default_graph.finalize()  #avoid modifications
     
     def _build_model(self):
-        l_input = Input(shape = Constants.IMAGE_SIZE)   # input layer, shape:(?,96,96,4)
+        l_input = Input(shape = Constants.IMAGE_SIZE)
         x = l_input
 
-        x = Convolution2D(16, (8,8), strides=(4,4), activation="relu")(x)      
-
-        x = Convolution2D(32, (3,3), strides=(2,2), activation="relu")(x)      
-
         x = Flatten()(x)                      
-    
-        x = Dense (Constants.FEATURE_LAYER, activation="relu")(x) 
-                                    
+
+        x = Dense(16, activation="relu", name = "dense1")(x)      
+
+        x = Dense(8, activation="relu", name = "dense2")(x)      
+                                        
         #l_dense = Dense (16, activation="relu")(x)
                                                     
-            
         #actions need to have a correct probability distribution, hence the softmax activation
-        out_actions = Dense(Constants.NUM_ACTIONS, activation="softmax")(x)  
+        out_actions = Dense(Constants.NUM_ACTIONS, activation="softmax", name="dense3")(x)  
 
-        out_values = Dense(1, activation="linear")(x)              
+        out_values = Dense(1, activation="linear", name="dense4")(x)              
                                                                             
                                                                         
         
@@ -98,7 +95,7 @@ class MasterNetwork:
             # array placeholders that hold a whole batch later when called in minimize()
             # first dimension is unlimited and represents training batches
             # second dimension is number of variables (e.g. image width, second dim is image height, fourth width is stack size)
-            s_t = tf.placeholder(tf.float32, shape=(None, Constants.IMAGE_SIZE[0], Constants.IMAGE_SIZE[1], Constants.IMAGE_SIZE[2]), name = "state")
+            s_t = tf.placeholder(tf.float32, shape=(None, Constants.IMAGE_SIZE[0], Constants.IMAGE_SIZE[1]), name = "state")
             a_t = tf.placeholder(tf.float32, shape=(None, Constants.NUM_ACTIONS), name="actions")
             r_t = tf.placeholder(tf.float32, shape=(None, 1), name = "rewards")  #discounted n-step reward
             lr_t = tf.placeholder(tf.float32, shape= [], name = "learning_rate")

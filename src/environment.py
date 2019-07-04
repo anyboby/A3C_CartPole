@@ -75,12 +75,12 @@ class Environment(threading.Thread):
         #print(id(self.env))
 
         with self.env_lock:
-            img = self.env.reset()
+            s_init = self.env.reset()
 
-        img =  self._process_img(img)
+        #img =  self._process_img(img)
         s = np.zeros(self.OWN_IMAGE_SIZE)
         for i in range(self.OWN_IMAGE_STACK):   
-            s[:,:,i] = img
+            s[:,i] = s_init
 
         self.maxEpReward = 0
         R = 0
@@ -91,19 +91,20 @@ class Environment(threading.Thread):
             time.sleep(Constants.THREAD_DELAY) #yield delay for safety
             
             if self.render: self.env.render()
-            a, pi, p = self.agent.act(s)  #action based on current state
-            action = [i*p for i in Constants.DISC_ACTIONS[a]]
+            a, pi = self.agent.act(s)  #action based on current state
+            #action = [i*p for i in Constants.DISC_ACTIONS[a]]
 
             with self.env_lock:
-                print("stepping with : " + str(action))
-                img_rgb, r, done, info = self.env.step(action) #retrieve the next state and reward for the corresponding action
+                
+                # print("stepping with : " + str(a))
+
+                state_in, r, done, info = self.env.step(a) #retrieve the next state and reward for the corresponding action
 
             if not done:
-                img =  self._process_img(img_rgb)
 
                 for i in range(self.OWN_IMAGE_STACK-1):
-                    s_[:,:,i] = s_[:,:,i+1]  # update stacked layers with the older stacked layers from previous step 
-                s_[:,:,self.OWN_IMAGE_STACK-1] = img  # update newest picture on top of stack
+                    s_[:,i] = s_[:,i+1]  # update stacked layers with the older stacked layers from previous step 
+                s_[:,self.OWN_IMAGE_STACK-1] = state_in  # update newest picture on top of stack
             else:    #last step of episode is finished, no next state
                 s_ = None
 
@@ -125,9 +126,9 @@ class Environment(threading.Thread):
             self.agent.train(s, a, r, s_,) 
 
             #skip frames for speed
-            if self.cvshow:
-                cv2.imshow("image", s)
-                cv2.waitKey(Constants.WAITKEY)
+            #if self.cvshow:
+            #    cv2.imshow("image", s)
+            #    cv2.waitKey(Constants.WAITKEY)
 
             if not done:
                 #tensorboard epxects batchsize in first dimension, so add additional dim
